@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from chat.serializers import MessageSerializer, RoomSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework import status #/ Create your views here.
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class =UserSerializer
@@ -35,9 +38,11 @@ class UserViewset(viewsets.ModelViewSet):
 class ChatRoomViewset(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
     def create(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -45,10 +50,19 @@ class ChatRoomViewset(viewsets.ModelViewSet):
         return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
-        print(serializer)
         return serializer.save()
 
 
 class MessageViewset(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED, headers=headers)

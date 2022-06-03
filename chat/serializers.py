@@ -4,6 +4,7 @@ from rest_framework import serializers
 from chat.models import Message, Room 
 from django.contrib.auth.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -11,7 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['date_joined','user_permissions','groups','is_active','is_staff','is_superuser','last_login']
     def create(self, validated_data):
-        print('hey')        
         user = User(
             email=validated_data['email'],
             username=validated_data['username']
@@ -21,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class MessageSerializer(serializers.ModelSerializer):
+    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model=Message
         fields = '__all__'
@@ -29,6 +30,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
     # participants = serializers.ReadOnlyField(many=True)
+    # torrent_file = serializers.FileField(use_url=True)
+
     class Meta:
         model=Room
         fields = '__all__'
