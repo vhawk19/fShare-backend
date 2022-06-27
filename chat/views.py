@@ -9,6 +9,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from chat.auth import CsrfExemptSessionAuthentication
+# from restframework_simplejwt.tokens import AccessToken
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class =UserSerializer
@@ -40,10 +41,10 @@ class UserViewset(viewsets.ModelViewSet):
 class ChatRoomViewset(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+    # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -56,7 +57,7 @@ class ChatRoomViewset(viewsets.ModelViewSet):
 
 
 class MessageViewset(viewsets.ModelViewSet):
-    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+    # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Message.objects.all()
@@ -68,3 +69,26 @@ class MessageViewset(viewsets.ModelViewSet):
         obj = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED, headers=headers)
+
+class ChatRoomViewsetByUser(viewsets.ViewSet):
+    # queryset = Room.objects.all()
+    # serializer_class = RoomSerializer
+    # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def list(self, request):
+        print(request.user)
+        queryset = Room.objects.filter(participants__in=[request.user])
+        serializer = RoomSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+class MessageViewsetByChatRoom(viewsets.ViewSet):
+    # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        print(request.user)
+        cid = self.request.query_params.get('cid')
+        print(cid)
+        queryset = Message.objects.filter(room_id__in=[cid])
+        serializer = MessageSerializer(queryset, many=True)
+        return Response(serializer.data)

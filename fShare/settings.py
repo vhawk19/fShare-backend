@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@v4h6psp^$_ypb-)_zz4*7r0ink3u5-=tp5c5@y+131l-73(ip
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://localhost','127.0.0.1']
+ALLOWED_HOSTS = ['http://localhost','127.0.0.1','localhost']
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000','http://127.0.0.1:3000']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -69,8 +69,7 @@ MIDDLEWARE = [
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        # CsrfExemptSessionAuthentication,
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 # CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect

@@ -4,7 +4,10 @@ from chat import views
 
 router = DefaultRouter()
 router.register(prefix=r'chat',viewset=views.ChatRoomViewset,basename="chat")
+router.register(prefix=r'chat-room',viewset=views.ChatRoomViewsetByUser,basename="chatRoom")
 router.register(prefix=r'messages',viewset=views.MessageViewset,basename="messages")
+router.register(prefix=r'messages-room',viewset=views.MessageViewsetByChatRoom,basename="messagesRoom")
+
 router.register(prefix=r'user',viewset=views.UserViewset,basename="user")
 
 
