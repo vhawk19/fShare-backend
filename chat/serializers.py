@@ -21,7 +21,16 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class MessageSerializer(serializers.ModelSerializer):
-    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
+     # creator = serializers.Field(default=serializers.CurrentUserDefault())
+    # creator = serializers.HiddenField()
+    class Meta:
+        model=Message
+        fields = '__all__'
+        # read_only_fields = ['room_id']
+        # depth = 1
+class ReadMessageSerializer(serializers.ModelSerializer):
+    # creator = serializers.Field(default=serializers.CurrentUserDefault())
+    # creator = serializers.ReadOnlyField(default=serializers.CurrentUserDefault())
     class Meta:
         model=Message
         fields = '__all__'

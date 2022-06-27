@@ -1,8 +1,9 @@
+from email import message
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from chat.models import Room, Message
 from django.contrib.auth.models import User
-from chat.serializers import MessageSerializer, RoomSerializer, UserSerializer
+from chat.serializers import MessageSerializer, RoomSerializer, UserSerializer, ReadMessageSerializer
 from rest_framework.response import Response
 from rest_framework import status #/ Create your views here.
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -10,6 +11,25 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from chat.auth import CsrfExemptSessionAuthentication
 # from restframework_simplejwt.tokens import AccessToken
+
+class MessageCreateView(views.APIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        # snippet = self.get_object(pk)
+        print(request.data)
+        print(request.user)
+        data = request.data
+        data['creator'] = request.user.id
+        print(data)
+
+        serializer = MessageSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class =UserSerializer
@@ -46,6 +66,8 @@ class ChatRoomViewset(viewsets.ModelViewSet):
 
     
     def create(self, request, *args, **kwargs):
+        data=request.data
+        data['creator'] = request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -55,13 +77,28 @@ class ChatRoomViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         return serializer.save()
 
-
 class MessageViewset(viewsets.ModelViewSet):
     # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(self.get_serializer(obj).data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class MessageViewsetRead(viewsets.ModelViewSet):
+    # authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Message.objects.all()
+    serializer_class = ReadMessageSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -90,5 +127,5 @@ class MessageViewsetByChatRoom(viewsets.ViewSet):
         cid = self.request.query_params.get('cid')
         print(cid)
         queryset = Message.objects.filter(room_id__in=[cid])
-        serializer = MessageSerializer(queryset, many=True)
+        serializer = ReadMessageSerializer(queryset, many=True)
         return Response(serializer.data)
