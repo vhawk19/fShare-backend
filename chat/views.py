@@ -8,9 +8,11 @@ from rest_framework import status #/ Create your views here.
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from chat.auth import CsrfExemptSessionAuthentication
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class =UserSerializer
+    
 
     # @action(detail=True, methods=['post'])
     # def set_password(self, request, pk=None):
@@ -38,7 +40,7 @@ class UserViewset(viewsets.ModelViewSet):
 class ChatRoomViewset(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
 
@@ -54,7 +56,7 @@ class ChatRoomViewset(viewsets.ModelViewSet):
 
 
 class MessageViewset(viewsets.ModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = Message.objects.all()
