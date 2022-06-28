@@ -29,8 +29,8 @@ DEBUG = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=100),
 }
-ALLOWED_HOSTS = ['http://localhost','127.0.0.1','localhost']
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000','http://127.0.0.1:3000']
+ALLOWED_HOSTS = ['http://localhost','127.0.0.1','localhost','39.59.50.131']
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000','http://127.0.0.1:3000','http://39.59.50.131:8000']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -44,7 +44,7 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://127.0.0.1:3000']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://127.0.0.1:3000',"http://39.59.50.131:8000"]
 # CSRF_COOKIE_HTTPONLY=False
 # Application definition
 
